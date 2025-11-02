@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- New Attractive Palette: Deep Teal & Soft Coral --><!-- Application Structure Plan: Retained the single vertical flow with an interactive tab system. Header -> Introduction -> Interactive Controls (Tabs) -> Dynamic Content Area (Package Cards) -> New "Learn More" Button (Modal Trigger) -> Comparative Visualization (Chart) -> Footer. This structure provides a clear, guided user experience for comparing the three packages, now with a new call-to-action for detailed information. --><!-- Visualization & Content Choices: 1. Report Info: 3 packages. Viz/Method: Retained the HTML/Tailwind "Tab" buttons controlling 3 "Package Detail Cards". Interaction: On-click, JS toggles visibility and applies an 'active' class. Justification: Standard, intuitive, and now visually appealing UX pattern for comparison. 2. Report Info: Package cost/session data. Goal: Visualize value. Viz/Method: Retained the Chart.js Horizontal Bar Chart. Interaction: Chart bars are dynamically recolored on tab-click, highlighting the selected package's value. Justification: A bar chart is the clearest way to compare these 3 numerical values. The interactive highlighting creates a strong connection between the selected package and its underlying data value. Library: Chart.js. 3. New Feature: Instant Breathing Guide. Viz/Method: Text input, button, audio player, and loading state. Interaction: User inputs focus, clicks button, Gemini generates TTS audio, and audio plays. Library: Gemini API (TTS). --><!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. All emojis have been removed. --><script>
+    <!-- New Attractive Palette: Deep Teal & Soft Coral --><!-- Application Structure Plan: Retained the single vertical flow with an interactive tab system. Header -> Introduction -> Interactive Controls (Tabs) -> Dynamic Content Area (Package Cards) -> New "Learn More" Button (Modal Trigger) -> Comparative Visualization (Chart) -> Terms & Conditions Button (New Modal) -> Footer. This structure provides a clear, guided user experience for comparing the three packages, now with new, dedicated interactive elements for both marketing content and legal terms. --><!-- Visualization & Content Choices: 1. Report Info: 3 packages. Viz/Method: Retained the HTML/Tailwind "Tab" buttons controlling 3 "Package Detail Cards". Interaction: On-click, JS toggles visibility and applies an 'active' class. Justification: Standard, intuitive, and now visually appealing UX pattern for comparison. 2. Report Info: Package cost/session data. Goal: Visualize value. Viz/Method: Retained the Chart.js Horizontal Bar Chart. Interaction: Chart bars are dynamically recolored on tab-click, highlighting the selected package's value. Justification: A bar chart is the clearest way to compare these 3 numerical values. The interactive highlighting creates a strong connection between the selected package and its underlying data value. Library: Chart.js. --><!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. All emojis have been removed. --><script>
         tailwind.config = {
             theme: {
                 extend: {
@@ -128,7 +128,6 @@
                         <h2 class="text-xl md:text-3xl font-bold text-brand-primary mb-3">3-Month Package</h2>
                         <p class="text-3xl md:text-4xl font-bold text-brand-text mb-4">2,399 <span class="text-base font-normal">AED</span></p>
                         <ul class="space-y-2 text-sm md:text-lg text-brand-text/90">
-                            <li><strong class="text-brand-text">Sessions:</strong> 36 total sessions (3x/week)</li>
                             <li><strong class="text-brand-text">Key Bonus:</strong> 1 Free Soul Wood Therapy Session</li>
                             <li><strong class="text-brand-text">Loyalty Offer:</strong> 25% off on 6+ subsequent packages</li>
                             <li><strong class="text-brand-text">Freeze Policy:</strong> 2 Weeks Total (can be used together or separately)</li>
@@ -139,7 +138,7 @@
                         <h2 class="text-xl md:text-3xl font-bold text-brand-primary mb-3">6-Month Package</h2>
                         <p class="text-3xl md:text-4xl font-bold text-brand-text mb-4">2,999 <span class="text-base font-normal">AED</span></p>
                         <ul class="space-y-2 text-sm md:text-lg text-brand-text/90">
-                            <li><strong class="text-brand-text">Sessions:</strong> 72 sessions + 3 Free Sessions</li>
+                            <li><strong class="text-brand-text text-brand-secondary font-bold">Value Bonus:</strong> 3 Free Sessions Included</li>
                             <li><strong class="text-brand-text">Key Bonus:</strong> 2 Free Lymphatic Drainage Treatments</li>
                             <li><strong class="text-brand-text">Loyalty Offer:</strong> 30% off on 6+ subsequent packages</li>
                             <li><strong class="text-brand-text">Freeze Policy:</strong> 2 Weeks Total (can be used together or separately)</li>
@@ -150,7 +149,7 @@
                         <h2 class="text-xl md:text-3xl font-bold text-brand-primary mb-3">12-Month Package</h2>
                         <p class="text-3xl md:text-4xl font-bold text-brand-text mb-4">4,299 <span class="text-base font-normal">AED</span></p>
                         <ul class="space-y-2 text-sm md:text-lg text-brand-text/90">
-                            <li><strong class="text-brand-text">Sessions:</strong> 144 sessions + 1 Month Free</li>
+                            <li><strong class="text-brand-text text-brand-secondary font-bold">Value Bonus:</strong> 1 Month Free Included</li>
                             <li><strong class="text-brand-text">Key Bonus:</strong> 1 Free Lymphatic Drainage + 1 LODYana Signature (with Kizhi)</li>
                             <li><strong class="text-brand-text">Loyalty Offer:</strong> 25% off on different treatments all year (on 6+ packages)</li>
                             <li><strong class="text-brand-text">Freeze Policy:</strong> 4 Weeks Total (can be used together or separately)</li>
@@ -178,6 +177,14 @@
                     <canvas id="valueChart"></canvas>
                 </div>
             </section>
+
+            <!-- Terms & Conditions Button (NEW SECTION) -->
+            <section id="terms-section" class="text-center mt-6 md:mt-8">
+                <button id="btn-terms" class="inline-block bg-white text-brand-text font-semibold py-2 px-6 border border-brand-muted rounded-full text-sm md:text-base hover:bg-brand-muted transition-all duration-300 ease-in-out">
+                    View Full Terms & Conditions
+                </button>
+            </section>
+
         </main>
 
         <footer class="text-center mt-8 md:mt-16 pt-6 md:pt-8 border-t border-brand-border">
@@ -229,7 +236,37 @@
             </div>
         </div>
     </div>
-    <!-- End Modal -->
+    <!-- End Learn More Modal -->
+
+    <!-- Terms & Conditions Modal (NEW) -->
+    <div id="termsModal" class="fixed inset-0 z-50 hidden bg-brand-text/80 backdrop-blur-sm overflow-y-auto p-2 md:p-4 transition-opacity duration-300">
+        <div class="relative bg-brand-card rounded-xl shadow-2xl w-full max-w-md md:max-w-3xl mx-auto my-4 md:my-10 p-4 md:p-10">
+            <button id="closeTermsModalBtn" class="absolute top-3 right-3 md:top-4 md:right-4 text-brand-text hover:text-brand-secondary text-4xl font-light transition leading-none">
+                &times;
+            </button>
+            <h2 class="text-xl md:text-3xl font-bold text-brand-secondary mb-4 border-b pb-2 border-brand-secondary/30">Package Terms & Conditions</h2>
+            
+            <div class="space-y-4 md:space-y-5 text-sm md:text-base text-brand-text/90">
+                
+                <p><strong class="font-semibold text-brand-text">Non-Transferable & Non-Refundable:</strong> All package purchases are final, non-refundable, and non-transferable to any other person or account.</p>
+
+                <p><strong class="font-semibold text-brand-text">Activation:</strong> The package validity begins on the date of purchase or the date of the first class attended, whichever comes sooner.</p>
+                
+                <p><strong class="font-semibold text-brand-text">Usage:</strong> The package entitles the member to a maximum of 3 classes per week. Unused sessions from one week or month will not roll over to the next period.</p>
+
+                <p><strong class="font-semibold text-brand-text">Expiration:</strong> All package benefits expire automatically at the end of the stated duration.</p>
+
+                <p><strong class="font-semibold text-brand-text">Strict Adherence (Freeze Policy):</strong> Any attempt to extend the package or delay beyond the maximum allowed freeze time (2 weeks for 3/6-month packages, 4 weeks for 12-month packages) will result in the immediate forfeiture of all remaining classes and benefits.</p>
+
+                <p><strong class="font-semibold text-brand-text">Bonus Treatments:</strong> All complimentary treatments (Soul Wood Therapy, Lymphatic Treatment, LODYana Signature, etc.) must be booked and utilized within the package's active, un-frozen validity period. They cannot be exchanged for cash, credit, or package extensions if unused.</p>
+
+                <p><strong class="font-semibold text-brand-text">Discount Vouchers:</strong> The percentage discounts apply only to future purchases of 6-session or more wellness/treatment packages offered (excluding yoga packages). This discount is valid only during the active term of the current yoga package.</p>
+
+                <p><strong class="font-semibold text-brand-text">Pre-Booking:</strong> All classes must be pre-booked.</p>
+            </div>
+        </div>
+    </div>
+    <!-- End Terms & Conditions Modal -->
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -242,6 +279,11 @@
             const learnMoreButton = document.getElementById('btn-learn-more');
             const infoModal = document.getElementById('infoModal');
             const closeModalBtn = document.getElementById('closeModalBtn');
+            
+            // NEW Terms Modal elements
+            const termsButton = document.getElementById('btn-terms');
+            const termsModal = document.getElementById('termsModal');
+            const closeTermsModalBtn = document.getElementById('closeTermsModalBtn');
 
             // Updated chart colors for attractive theme
             const chartColors = {
@@ -251,8 +293,8 @@
 
             const chartData = {
                 'pkg-3': 66.64,
-                'pkg-6': 39.99,
-                'pkg-12': 27.56
+                'pkg-6': 39.99 * (72 / 75), // Recalculated for 3 free sessions
+                'pkg-12': 27.56 * (12 / 13) // Recalculated for 1 month free
             };
             
             const valueChart = new Chart(ctx, {
@@ -360,7 +402,7 @@
                 });
             });
 
-            // Modal Logic
+            // Modal Logic (Learn More)
             learnMoreButton.addEventListener('click', (e) => {
                 e.preventDefault();
                 infoModal.classList.remove('hidden');
@@ -373,6 +415,21 @@
             infoModal.addEventListener('click', (e) => {
                 if (e.target === infoModal) {
                     infoModal.classList.add('hidden');
+                }
+            });
+
+            // Modal Logic (Terms & Conditions)
+            termsButton.addEventListener('click', () => {
+                termsModal.classList.remove('hidden');
+            });
+
+            closeTermsModalBtn.addEventListener('click', () => {
+                termsModal.classList.add('hidden');
+            });
+
+            termsModal.addEventListener('click', (e) => {
+                if (e.target === termsModal) {
+                    termsModal.classList.add('hidden');
                 }
             });
 
