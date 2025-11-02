@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LODYana Spa - Signature Yoga Packages</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- New Attractive Palette: Deep Teal & Soft Coral --><!-- Application Structure Plan: Retained the single vertical flow with an interactive tab system. Header -> Introduction -> Interactive Controls (Tabs) -> Dynamic Content Area (Package Cards) -> New "Learn More" Button (Modal Trigger) -> Comparative Visualization (Chart) -> Footer. This structure provides a clear, guided user experience for comparing the three packages, now with a new call-to-action for detailed information. --><!-- Visualization & Content Choices: 1. Report Info: 3 packages. Viz/Method: Retained the HTML/Tailwind "Tab" buttons controlling 3 "Package Detail Cards". Interaction: On-click, JS toggles visibility and applies an 'active' class. Justification: Standard, intuitive, and now visually appealing UX pattern for comparison. 2. Report Info: Package cost/session data. Goal: Visualize value. Viz/Method: Retained the Chart.js Horizontal Bar Chart. Interaction: Chart bars are dynamically recolored on tab-click, highlighting the selected package's value. Justification: A bar chart is the clearest way to compare these 3 numerical values. The interactive highlighting creates a strong connection between the selected package and its underlying data value. Library: Chart.js. 3. New Feature: Instant Breathing Guide. Viz/Method: Text input, button, audio player, and loading state. Interaction: User inputs focus, clicks button, Gemini generates TTS audio, and audio plays. Library: Gemini API (TTS). --><!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. All emojis have been removed. --><script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            bg: '#fbfcfd', // Very light, almost white background
+                            text: '#2c3e50', // Darker, professional text (deep charcoal/blue-grey)
+                            primary: '#1abc9c', // Deep Teal - Main accent
+                            'primary-light': '#a1e4d5', // Lighter Teal for inactive elements/hover
+                            secondary: '#e74c3c', // Soft Coral - for attention, e.g., chart highlight, potentially hover
+                            muted: '#e0e6ea', // Light grey for borders, inactive chart bars
+                            card: '#ffffff',
+                            border: '#e0e6ea', // Light grey border
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fbfcfd;
+            color: #2c3e50;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 250px;
+            max-height: 300px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 300px;
+            }
+        }
+        .tab-button {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); /* Softer shadow for buttons */
+        }
+        /* New attractive tab style */
+        .tab-button.active {
+            background-color: '#1abc9c'; /* Deep Teal */
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(26, 188, 156, 0.4); /* Stronger shadow for active */
+        }
+        .tab-button:not(.active) {
+            background-color: #ffffff; /* White background for inactive */
+            color: #2c3e50;
+        }
+        .tab-button:not(.active):hover {
+            background-color: #f0f4f7; /* Very light grey on hover */
+            color: #1abc9c; /* Teal text on hover */
+            border-color: #a1e4d5; /* Light teal border on hover */
+        }
+        .package-card {
+            transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+            will-change: opacity, transform;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08); /* More prominent shadow for cards */
+        }
+        .package-card.hidden {
+            opacity: 0;
+            transform: scale(0.98);
+            pointer-events: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="bg-brand-bg text-brand-text">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
+        
+        <header class="text-center mb-6 md:mb-12">
+            <h1 class="text-3xl md:text-5xl font-bold text-brand-primary">Signature Ancient Yoga</h1>
+            <p class="text-xl md:text-2xl font-light text-brand-text mt-1 md:mt-2">Mix with Breathing techniques</p>
+            <p class="text-base font-light text-brand-text/70 mt-1">"Inside Out Beauty"</p>
+        </header>
+
+        <main>
+            <section id="intro" class="text-center max-w-2xl mx-auto mb-6 md:mb-10">
+                <p class="text-base md:text-lg text-brand-text/90">
+                    Discover our exclusive packages that blend Signature Ancient Yoga with specialized Breathing techniques. All packages include three sessions per week. Explore the options below to find the perfect fit for your wellness journey.
+                </p>
+            </section>
+
+            <section id="package-explorer">
+                <!-- Mobile: flex-wrap ensures buttons wrap to new line if they overflow. Use smaller padding for buttons. -->
+                <div class="flex justify-center flex-wrap gap-2 md:gap-4 my-6">
+                    <button id="btn-3" data-pkg="pkg-3" class="tab-button active text-sm md:text-lg font-semibold py-2 px-4 md:py-3 md:px-10 rounded-full">
+                        3 Months
+                    </button>
+                    <button id="btn-6" data-pkg="pkg-6" class="tab-button text-sm md:text-lg font-semibold py-2 px-4 md:py-3 md:px-10 rounded-full">
+                        6 Months
+                    </button>
+                    <button id="btn-12" data-pkg="pkg-12" class="tab-button text-sm md:text-lg font-semibold py-2 px-4 md:py-3 md:px-10 rounded-full">
+                        12 Months
+                    </button>
+                </div>
+
+                <div id="package-details" class="relative min-h-[400px] md:min-h-[380px]">
+                    
+                    <div id="pkg-3" class="package-card bg-brand-card rounded-xl p-4 md:p-8 border border-brand-border">
+                        <h2 class="text-xl md:text-3xl font-bold text-brand-primary mb-3">3-Month Package</h2>
+                        <p class="text-3xl md:text-4xl font-bold text-brand-text mb-4">2,399 <span class="text-base font-normal">AED</span></p>
+                        <ul class="space-y-2 text-sm md:text-lg text-brand-text/90">
+                            <li><strong class="text-brand-text">Sessions:</strong> 36 total sessions (3x/week)</li>
+                            <li><strong class="text-brand-text">Key Bonus:</strong> 1 Free Soul Wood Therapy Session</li>
+                            <li><strong class="text-brand-text">Loyalty Offer:</strong> 25% off on 6+ subsequent packages</li>
+                            <li><strong class="text-brand-text">Freeze Policy:</strong> 2 Weeks Total (can be used together or separately)</li>
+                        </ul>
+                    </div>
+                    
+                    <div id="pkg-6" class="package-card hidden bg-brand-card rounded-xl p-4 md:p-8 border border-brand-border">
+                        <h2 class="text-xl md:text-3xl font-bold text-brand-primary mb-3">6-Month Package</h2>
+                        <p class="text-3xl md:text-4xl font-bold text-brand-text mb-4">2,999 <span class="text-base font-normal">AED</span></p>
+                        <ul class="space-y-2 text-sm md:text-lg text-brand-text/90">
+                            <li><strong class="text-brand-text">Sessions:</strong> 72 sessions + 3 Free Sessions</li>
+                            <li><strong class="text-brand-text">Key Bonus:</strong> 2 Free Lymphatic Drainage Treatments</li>
+                            <li><strong class="text-brand-text">Loyalty Offer:</strong> 30% off on 6+ subsequent packages</li>
+                            <li><strong class="text-brand-text">Freeze Policy:</strong> 2 Weeks Total (can be used together or separately)</li>
+                        </ul>
+                    </div>
+
+                    <div id="pkg-12" class="package-card hidden bg-brand-card rounded-xl p-4 md:p-8 border border-brand-border">
+                        <h2 class="text-xl md:text-3xl font-bold text-brand-primary mb-3">12-Month Package</h2>
+                        <p class="text-3xl md:text-4xl font-bold text-brand-text mb-4">4,299 <span class="text-base font-normal">AED</span></p>
+                        <ul class="space-y-2 text-sm md:text-lg text-brand-text/90">
+                            <li><strong class="text-brand-text">Sessions:</strong> 144 sessions + 1 Month Free</li>
+                            <li><strong class="text-brand-text">Key Bonus:</strong> 1 Free Lymphatic Drainage + 1 LODYana Signature (with Kizhi)</li>
+                            <li><strong class="text-brand-text">Loyalty Offer:</strong> 25% off on different treatments all year (on 6+ packages)</li>
+                            <li><strong class="text-brand-text">Freeze Policy:</strong> 4 Weeks Total (can be used together or separately)</li>
+                        </ul>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Learn More Button: Smaller text and padding for mobile -->
+            <section id="learn-more" class="text-center mt-8 md:mt-16">
+                <a id="btn-learn-more" href="#" class="inline-block bg-white text-brand-primary font-semibold py-2 px-6 border-2 border-brand-primary rounded-full text-base md:text-lg shadow-md hover:bg-brand-primary hover:text-white transition-all duration-300 ease-in-out">
+                    To know more about Ancient Yoga and Breathing Session
+                </a>
+            </section>
+
+            <section id="visualization" class="mt-8 md:mt-16">
+                <h2 class="text-xl md:text-3xl font-bold text-center text-brand-text">
+                    Package Value Comparison
+                </h2>
+                <p class="text-center text-sm md:text-lg text-brand-text/80 max-w-xl mx-auto mt-2 mb-4 md:mb-6">
+                    This chart illustrates the average cost per session. Longer-term packages provide greater value by reducing your per-session investment.
+                </p>
+                <div class="chart-container">
+                    <canvas id="valueChart"></canvas>
+                </div>
+            </section>
+        </main>
+
+        <footer class="text-center mt-8 md:mt-16 pt-6 md:pt-8 border-t border-brand-border">
+            <p class="text-xs md:text-base text-brand-text/70">
+                Freeze Policy Note: All package freeze periods can be used together or separately to accommodate your schedule.
+            </p>
+            <p class="text-base md:text-lg font-semibold text-brand-primary mt-3 md:mt-4">
+                Please Contact LODYana Healing and Wellness Center
+            </p>
+            <div class="mt-2 md:mt-3">
+                <a href="https://wa.me/971529353900" target="_blank" class="inline-flex items-center space-x-1 md:space-x-2 text-lg md:text-xl font-bold text-brand-primary hover:text-brand-text transition duration-300">
+                    <span class="text-2xl md:text-3xl">&#x1F4F1;</span>
+                    <span>WhatsApp: +971 52 935 3900</span>
+                </a>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- Learn More Modal - Hidden by default (FIXED FOR MOBILE VIEWPORT) -->
+    <div id="infoModal" class="fixed inset-0 z-50 hidden bg-brand-text/80 backdrop-blur-sm overflow-y-auto p-2 md:p-4 transition-opacity duration-300">
+        <!-- Max width set to w-full for mobile, smaller margin top/bottom on mobile (my-4) -->
+        <div class="relative bg-brand-card rounded-xl shadow-2xl w-full max-w-md md:max-w-3xl mx-auto my-4 md:my-10 p-4 md:p-10">
+            <button id="closeModalBtn" class="absolute top-3 right-3 md:top-4 md:right-4 text-brand-text hover:text-brand-secondary text-4xl font-light transition leading-none">
+                &times;
+            </button>
+            <h2 class="text-xl md:text-3xl font-bold text-brand-primary mb-4 border-b pb-2 border-brand-primary/30">The Transformative Benefits of Signature Ancient Yoga</h2>
+            
+            <div class="space-y-4 md:space-y-6 text-sm md:text-lg text-brand-text/90">
+                <p>At LODYana Healing and Wellness Center, we harness the profound power of **Ancient Yoga**—an age-old science proven to restore the body and mind. It is a philosophy that views true beauty as an expression of internal harmony.</p>
+
+                <h3 class="text-lg md:text-xl font-semibold text-brand-text border-l-4 border-brand-primary pl-3">Deep Cellular Restoration</h3>
+                <p>Ancient Yoga’s principles promote enhanced circulation and oxygenation at a cellular level. This process is key to **detoxification**, helping to flush impurities that contribute to dullness and stagnation in the body and skin.</p>
+
+                <h3 class="text-lg md:text-xl font-semibold text-brand-text border-l-4 border-brand-primary pl-3">Stress Mastery</h3>
+                <p>The core of this practice is the intentional regulation of the nervous system. By transitioning your body from the high-alert stress response to a state of profound calm, we dramatically lower levels of **Cortisol**, the primary aging and weight-gaining hormone.</p>
+
+                <h3 class="text-lg md:text-xl font-semibold text-brand-text border-l-4 border-brand-primary pl-3">Enhanced Vitality and Focus</h3>
+                <p>This deep internal reset clears mental fatigue and confusion, leading to superior **mental clarity** and a tangible boost in energy. Our high-profile clients benefit from this heightened focus, which translates directly to better performance in their demanding lives.</p>
+            
+                <h2 class="text-xl md:text-2xl font-bold text-brand-primary pt-4 md:pt-6 border-t mt-4 md:mt-6 border-brand-primary/30">LODYana Healing and Wellness Center: The Power of Inside Out Beauty</h2>
+                <p>Our core belief is **Inside Out Beauty**. We understand that true radiance is a reflection of internal health. Our philosophy is rooted in the powerful synergy of ancient wisdom and modern cosmetic science, addressing both your physical appearance and your essential well-being.</p>
+
+                <h3 class="text-base md:text-xl font-semibold text-brand-text border-l-4 border-brand-primary pl-3">The Tree of Life: Our Transformative Journey</h3>
+                <p>The **Tree of Life** symbolizes your LODYana journey. The roots represent your **inner soul and well-being**, which we nourish through our focused relaxation sessions. The strong trunk is your **body**, expertly refined and toned by our luxurious manual and cutting-edge machine treatments. The branches and leaves are your **outward manifestation**—the flawless skin, revitalized hair, and contoured body. Our treatments ensure that this brilliance is not temporary, but is robustly supported from the inside out.</p>
+
+                <h3 class="text-base md:text-xl font-semibold text-brand-text border-l-4 border-brand-primary pl-3">A Unique Blend of Luxury and Healing</h3>
+                <p>We distinguish ourselves by seamlessly integrating these deeply centering practices into your exclusive spa experience. Every luxurious treatment, from our advanced facials to our bespoke body contouring, is preceded by a personalized session designed to immediately **calm the nervous system**. This intentional blend prepares your muscles, skin, and mind for **maximum therapeutic benefit**, ensuring you absorb the full, luxurious potential of the service. You leave not only looking exquisite but feeling profoundly centered, vital, and transformed.</p>
+            </div>
+        </div>
+    </div>
+    <!-- End Modal -->
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            const buttons = document.querySelectorAll('.tab-button');
+            const cards = document.querySelectorAll('.package-card');
+            const ctx = document.getElementById('valueChart').getContext('2d');
+
+            // Modal elements
+            const learnMoreButton = document.getElementById('btn-learn-more');
+            const infoModal = document.getElementById('infoModal');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+
+            // Updated chart colors for attractive theme
+            const chartColors = {
+                active: '#1abc9c', // Deep Teal
+                inactive: '#e0e6ea' // Light grey
+            };
+
+            const chartData = {
+                'pkg-3': 66.64,
+                'pkg-6': 39.99,
+                'pkg-12': 27.56
+            };
+            
+            const valueChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['3 Months', '6 Months', '12 Months'],
+                    datasets: [{
+                        label: 'Avg. Cost per Session (AED)',
+                        data: [chartData['pkg-3'], chartData['pkg-6'], chartData['pkg-12']],
+                        backgroundColor: [
+                            chartColors.active, 
+                            chartColors.inactive, 
+                            chartColors.inactive
+                        ],
+                        borderColor: '#ffffff',
+                        borderWidth: 2,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ` ${context.dataset.label}: ${context.raw.toFixed(2)} AED`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Avg. Cost per Session (AED)',
+                                font: {
+                                    size: 14
+                                },
+                                color: '#555555'
+                            },
+                            grid: {
+                                display: true,
+                                color: '#eeeeee'
+                            },
+                            ticks: {
+                                color: '#555555'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: {
+                                    size: 14,
+                                    weight: '500'
+                                },
+                                color: '#333333'
+                            }
+                        }
+                    }
+                }
+            });
+
+            function updateTabs(activeButton) {
+                buttons.forEach(button => {
+                    button.classList.remove('active');
+                });
+                activeButton.classList.add('active');
+            }
+
+            function updateCards(selectedPkgId) {
+                cards.forEach(card => {
+                    if (card.id === selectedPkgId) {
+                        card.classList.remove('hidden');
+                    } else {
+                        card.classList.add('hidden');
+                    }
+                });
+            }
+
+            function updateChartHighlight(selectedPkgId) {
+                const newColors = [
+                    selectedPkgId === 'pkg-3' ? chartColors.active : chartColors.inactive,
+                    selectedPkgId === 'pkg-6' ? chartColors.active : chartColors.inactive,
+                    selectedPkgId === 'pkg-12' ? chartColors.active : chartColors.inactive,
+                ];
+                valueChart.data.datasets[0].backgroundColor = newColors;
+                valueChart.update();
+            }
+
+            buttons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const selectedPkg = button.dataset.pkg;
+                    
+                    updateTabs(button);
+                    updateCards(selectedPkg);
+                    updateChartHighlight(selectedPkg);
+                });
+            });
+
+            // Modal Logic
+            learnMoreButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                infoModal.classList.remove('hidden');
+            });
+
+            closeModalBtn.addEventListener('click', () => {
+                infoModal.classList.add('hidden');
+            });
+
+            infoModal.addEventListener('click', (e) => {
+                if (e.target === infoModal) {
+                    infoModal.classList.add('hidden');
+                }
+            });
+
+        });
+    </script>
+
+</body>
+</html>
